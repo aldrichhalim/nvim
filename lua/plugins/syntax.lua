@@ -10,6 +10,7 @@ return {
                 'cpp',
                 'css',
                 'json',
+                'java',
                 'lua',
                 'python',
                 'vim',

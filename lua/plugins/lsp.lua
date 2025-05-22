@@ -51,6 +51,9 @@ return {
             lspconfig.pylsp.setup {
                 capabilities = capabilities,
             }
+            lspconfig.jdtls.setup {
+                capabilities = capabilities,
+            }
             -- NOTE: add more LSP setup here
 
             -- luasnip setup
@@ -124,7 +127,7 @@ return {
         config = function()
             require('mason').setup()
             require('mason-lspconfig').setup {
-                ensure_installed = { 'clangd', 'lua_ls', 'pylsp', 'ts_ls' },
+                ensure_installed = { 'clangd', 'lua_ls', 'jdtls', 'pylsp', 'ts_ls' },
             }
         end,
     },
