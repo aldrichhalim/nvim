@@ -28,20 +28,50 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
--- configs
+-- Optimizations
+vim.g.loaded_gzip = 1
+vim.g.loaded_zip = 1
+vim.g.loaded_zipPlugin = 1
+vim.g.loaded_tar = 1
+vim.g.loaded_tarPlugin = 1
+vim.g.loaded_getscript = 1
+vim.g.loaded_getscriptPlugin = 1
+vim.g.loaded_vimball = 1
+vim.g.loaded_vimballPlugin = 1
+vim.g.loaded_2html_plugin = 1
+vim.g.loaded_matchit = 1
+vim.g.loaded_matchparen = 1
+vim.g.loaded_logiPat = 1
+vim.g.loaded_rrhelper = 1
+
+-- Core settings
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
+vim.opt.smartindent = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes:2'
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
+vim.opt.undofile = true
+vim.opt.scrolloff = 8
+vim.opt.sidescrolloff = 8
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.termguicolors = true
+vim.opt.conceallevel = 2
+
+-- Disable auto comment continuation
 vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
     vim.opt.formatoptions:remove { 'c', 'r', 'o' }
   end,
 })
+
+-- Folding setup
 vim.o.foldcolumn = '0'
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
@@ -248,6 +278,7 @@ require('lazy').setup {
 
     {
       'nvim-telescope/telescope.nvim',
+      tag = '0.1.8',
       cmd = 'Telescope',
       keys = {
         { '<leader>ff', '<cmd>Telescope find_files<cr>', desc = 'Find files' },
