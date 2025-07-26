@@ -52,6 +52,10 @@ require('lazy').setup {
   spec = {
     {
       'neovim/nvim-lspconfig',
+      event = { 'BufReadPre', 'BufNewFile' },
+      dependencies = {
+        'hrsh7th/cmp-nvim-lsp',
+      },
       config = function()
         local lspconfig = require 'lspconfig'
         -- Enhanced on_attach function with key bindings
@@ -81,9 +85,10 @@ require('lazy').setup {
           vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
           vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
         end
-        -- Enhanced capabilities
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+        -- Enhanced capabilities with nvim-cmp
+        local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
         -- Diagnostic configuration
         vim.diagnostic.config {
           virtual_text = true,
@@ -121,6 +126,7 @@ require('lazy').setup {
 
     {
       'hrsh7th/nvim-cmp',
+      event = 'InsertEnter',
       dependencies = {
         'hrsh7th/cmp-nvim-lsp',
         'hrsh7th/cmp-buffer',
@@ -179,19 +185,38 @@ require('lazy').setup {
     },
 
     {
-      'mason-org/mason-lspconfig.nvim',
+      'mason-org/mason.nvim',
+      cmd = 'Mason',
+      build = ':MasonUpdate',
       opts = {},
+    },
+
+    {
+      'mason-org/mason-lspconfig.nvim',
+      event = { 'BufReadPre', 'BufNewFile' },
       dependencies = {
-        { 'mason-org/mason.nvim', opts = {} },
+        'mason-org/mason.nvim',
         'neovim/nvim-lspconfig',
       },
+      opts = {},
     },
 
     {
       'nvim-treesitter/nvim-treesitter',
-      branch = 'master',
-      lazy = false,
+      event = { 'BufReadPost', 'BufNewFile' },
       build = ':TSUpdate',
+      config = function()
+        require('nvim-treesitter.configs').setup {
+          ensure_installed = { 'lua', 'python', 'javascript', 'typescript', 'java' },
+          auto_install = true,
+          highlight = {
+            enable = true,
+          },
+          indent = {
+            enable = true,
+          },
+        }
+      end,
     },
 
     {
@@ -199,8 +224,6 @@ require('lazy').setup {
       lazy = false,
       priority = 1000,
       config = function()
-        -- Optionally configure and load the colorscheme
-        -- directly inside the plugin declaration.
         vim.g.sonokai_style = 'atlantis'
         vim.g.sonokai_better_performance = 1
         vim.g.sonokai_enable_italic = true
@@ -210,6 +233,7 @@ require('lazy').setup {
 
     {
       'nvim-lualine/lualine.nvim',
+      event = 'VeryLazy',
       dependencies = { 'nvim-tree/nvim-web-devicons' },
       opts = {
         theme = 'sonokai',
@@ -218,14 +242,16 @@ require('lazy').setup {
 
     {
       'nvim-telescope/telescope.nvim',
-      tag = '0.1.8',
+      cmd = 'Telescope',
+      keys = {
+        { '<leader>ff', '<cmd>Telescope find_files<cr>', desc = 'Find files' },
+        { '<leader>fg', '<cmd>Telescope live_grep<cr>', desc = 'Live grep' },
+        { '<leader>fb', '<cmd>Telescope buffers<cr>', desc = 'Buffers' },
+        { '<leader>fh', '<cmd>Telescope help_tags<cr>', desc = 'Help tags' },
+      },
       dependencies = { 'nvim-lua/plenary.nvim' },
       config = function()
-        local builtin = require 'telescope.builtin'
-        vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
-        vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
-        vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
-        vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
+        require('telescope').setup {}
       end,
     },
 
@@ -233,30 +259,38 @@ require('lazy').setup {
       'windwp/nvim-autopairs',
       event = 'InsertEnter',
       config = true,
-      -- use opts = {} for passing setup options
-      -- this is equivalent to setup({}) function
     },
 
     {
       'folke/todo-comments.nvim',
+      event = { 'BufReadPost', 'BufNewFile' },
       dependencies = { 'nvim-lua/plenary.nvim' },
-      opts = {
-        -- your configuration comes here
-        -- or leave it empty to use the default settings
-        -- refer to the configuration section below
-      },
+      opts = {},
     },
 
     {
       'kevinhwang91/nvim-ufo',
+      event = { 'BufReadPost', 'BufNewFile' },
       dependencies = {
         'kevinhwang91/promise-async',
       },
+      keys = {
+        {
+          'zR',
+          function()
+            require('ufo').openAllFolds()
+          end,
+          desc = 'Open all folds',
+        },
+        {
+          'zM',
+          function()
+            require('ufo').closeAllFolds()
+          end,
+          desc = 'Close all folds',
+        },
+      },
       config = function()
-        -- fold
-        vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
-        vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
-
         require('ufo').setup {
           provider_selector = function()
             return { 'treesitter', 'indent' }
@@ -267,12 +301,60 @@ require('lazy').setup {
 
     {
       'lewis6991/gitsigns.nvim',
-      opts = {},
+      event = { 'BufReadPre', 'BufNewFile' },
+      opts = {
+        signs = {
+          add = { text = '│' },
+          change = { text = '│' },
+          delete = { text = '_' },
+          topdelete = { text = '‾' },
+          changedelete = { text = '~' },
+          untracked = { text = '┆' },
+        },
+        on_attach = function(bufnr)
+          local gs = package.loaded.gitsigns
+
+          local function map(mode, l, r, opts)
+            opts = opts or {}
+            opts.buffer = bufnr
+            vim.keymap.set(mode, l, r, opts)
+          end
+
+          -- Navigation
+          map('n', ']c', function()
+            if vim.wo.diff then
+              return ']c'
+            end
+            vim.schedule(function()
+              gs.next_hunk()
+            end)
+            return '<Ignore>'
+          end, { expr = true })
+
+          map('n', '[c', function()
+            if vim.wo.diff then
+              return '[c'
+            end
+            vim.schedule(function()
+              gs.prev_hunk()
+            end)
+            return '<Ignore>'
+          end, { expr = true })
+
+          -- Actions
+          map('n', '<leader>hs', gs.stage_hunk)
+          map('n', '<leader>hr', gs.reset_hunk)
+          map('n', '<leader>hS', gs.stage_buffer)
+          map('n', '<leader>hR', gs.reset_buffer)
+          map('n', '<leader>hp', gs.preview_hunk)
+          map('n', '<leader>hb', function()
+            gs.blame_line { full = true }
+          end)
+          map('n', '<leader>hd', gs.diffthis)
+        end,
+      },
     },
   },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { 'habamax' } },
-  -- automatically check for plugin updates
+  install = { colorscheme = { 'sonokai' } },
   checker = { enabled = false },
 }
