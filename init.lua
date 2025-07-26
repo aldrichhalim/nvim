@@ -273,6 +273,14 @@ require('lazy').setup {
       dependencies = { 'nvim-tree/nvim-web-devicons' },
       opts = {
         theme = 'sonokai',
+        sections = {
+          lualine_c = {
+            {
+              'filename',
+              path = 1,
+            },
+          },
+        },
       },
     },
 
