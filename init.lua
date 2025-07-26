@@ -220,6 +220,12 @@ require('lazy').setup {
     },
 
     {
+      'lukas-reineke/indent-blankline.nvim',
+      main = 'ibl',
+      opts = {},
+    },
+
+    {
       'sainnhe/sonokai',
       lazy = false,
       priority = 1000,
