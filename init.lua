@@ -100,6 +100,13 @@ require('lazy').setup({
     },
 
     {
+      'echasnovski/mini.icons',
+      version = '*',
+      event = 'InsertEnter',
+      opts = {},
+    },
+
+    {
       'echasnovski/mini.completion',
       version = '*',
       event = 'InsertEnter',
