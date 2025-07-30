@@ -1,15 +1,15 @@
 -- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system {
+  local out = vim.fn.system({
     'git',
     'clone',
     '--filter=blob:none',
     '--branch=stable',
     lazyrepo,
     lazypath,
-  }
+  })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
@@ -67,7 +67,7 @@ vim.opt.conceallevel = 2
 -- Disable auto comment continuation
 vim.api.nvim_create_autocmd('BufEnter', {
   callback = function()
-    vim.opt.formatoptions:remove { 'c', 'r', 'o' }
+    vim.opt.formatoptions:remove({ 'c', 'r', 'o' })
   end,
 })
 
@@ -87,10 +87,10 @@ vim.lsp.config('lua_ls', {
     },
   },
 })
-vim.lsp.enable { 'jdtls', 'pyright', 'ts_ls', 'lua_ls' }
+vim.lsp.enable({ 'jdtls', 'pyright', 'ts_ls', 'lua_ls' })
 
 -- Setup lazy.nvim
-require('lazy').setup {
+require('lazy').setup({
   spec = {
     {
       'echasnovski/mini.snippets',
@@ -135,8 +135,16 @@ require('lazy').setup {
       event = { 'BufReadPost', 'BufNewFile' },
       build = ':TSUpdate',
       config = function()
-        require('nvim-treesitter.configs').setup {
-          ensure_installed = { 'lua', 'python', 'javascript', 'typescript', 'java', 'markdown', 'json' },
+        require('nvim-treesitter.configs').setup({
+          ensure_installed = {
+            'lua',
+            'python',
+            'javascript',
+            'typescript',
+            'java',
+            'markdown',
+            'json',
+          },
           auto_install = true,
           highlight = {
             enable = true,
@@ -145,7 +153,7 @@ require('lazy').setup {
           indent = {
             enable = true,
           },
-        }
+        })
       end,
     },
 
@@ -189,7 +197,7 @@ require('lazy').setup {
         vim.g.sonokai_style = 'atlantis'
         vim.g.sonokai_better_performance = 1
         vim.g.sonokai_enable_italic = true
-        vim.cmd.colorscheme 'sonokai'
+        vim.cmd.colorscheme('sonokai')
       end,
     },
 
@@ -224,14 +232,18 @@ require('lazy').setup {
         { '<leader>fb', '<cmd>Telescope buffers<cr>', desc = 'Buffers' },
         { '<leader>fh', '<cmd>Telescope help_tags<cr>', desc = 'Help tags' },
         { '<leader>fr', '<cmd>Telescope oldfiles<cr>', desc = 'Recent files' },
-        { '<leader>fc', '<cmd>Telescope grep_string<cr>', desc = 'Find word under cursor' },
+        {
+          '<leader>fc',
+          '<cmd>Telescope grep_string<cr>',
+          desc = 'Find word under cursor',
+        },
       },
       dependencies = {
         'nvim-lua/plenary.nvim',
         'nvim-tree/nvim-web-devicons',
       },
       config = function()
-        require('telescope').setup {
+        require('telescope').setup({
           defaults = {
             mappings = {
               i = {
@@ -241,7 +253,7 @@ require('lazy').setup {
             },
             file_ignore_patterns = { 'node_modules', '.git' },
           },
-        }
+        })
       end,
     },
 
@@ -312,11 +324,11 @@ require('lazy').setup {
         },
       },
       config = function()
-        require('ufo').setup {
+        require('ufo').setup({
           provider_selector = function()
             return { 'treesitter', 'indent' }
           end,
-        }
+        })
       end,
     },
 
@@ -356,12 +368,17 @@ require('lazy').setup {
           map('n', '<leader>hR', gs.reset_buffer, { desc = 'Reset buffer' })
           map('n', '<leader>hp', gs.preview_hunk, { desc = 'Preview hunk' })
           map('n', '<leader>hb', function()
-            gs.blame_line { full = true }
+            gs.blame_line({ full = true })
           end, { desc = 'Blame line' })
           map('n', '<leader>hd', gs.diffthis, { desc = 'Diff this' })
 
           -- Text object
-          map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'Select git hunk' })
+          map(
+            { 'o', 'x' },
+            'ih',
+            ':<C-U>Gitsigns select_hunk<CR>',
+            { desc = 'Select git hunk' }
+          )
         end,
       },
     },
@@ -385,4 +402,4 @@ require('lazy').setup {
       },
     },
   },
-}
+})
